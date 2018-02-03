@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_vedio_record"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <com.example.zth.seven.VideoProgressView
+                android:id="@+id/libVideoRecorder_progress"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"/>
+
+            <FrameLayout
+                android:id="@+id/libVideoRecorder_fl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="80dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/libVideoRecorder_tv_tips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:text="移开取消"
+            android:textColor="#FF00FF29"
+            android:textSize="16sp"
+            android:visibility="invisible"/>
+
+        <Button
+            android:id="@+id/libVideoRecorder_btn_start"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/libvideo_recorder_default"
+            android:focusable="true"
+            android:text="按住拍"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"/>
+    </LinearLayout>
+</FrameLayout>

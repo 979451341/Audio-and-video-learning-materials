@@ -1,0 +1,232 @@
+说说AIDL生成的Java代码
+https://blog.csdn.net/z979451341/article/details/65443113
+
+
+首先的说明，本篇博客是从AIDL生产java代码这方面入手说明的，而且使用的是上一篇博客的项目做示范项目，所以我在本篇博客我只会贴出部分关键代码，其他代码请看上一篇博客。
+https://blog.csdn.net/z979451341/article/details/64905709
+
+我在com.example.aidlserver路径创建一个AIDL文件
+
+```
+interface IRemote
+{
+   int multi(int a, int b);
+
+}
+```
+然后点击Make Project，以下图片路径找到这个AIDL生成的java代码
+
+![这里写图片描述](https://img-blog.csdn.net/20180416102613583?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3o5Nzk0NTEzNDE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+生成Java代码内容如下（明明AIDL写的这么少，生成的代码这么多，还都是向左靠齐，但是不要慌，经过我一顿tab整理）
+
+```
+/*
+ * This file is auto-generated.  DO NOT MODIFY.
+ * Original file: /Users/longzhenhao/Desktop/Server/app/src/main/aidl/com/example/aidlserver/IRemote.aidl
+ */
+package com.example.aidlserver;
+// Declare any non-default types here with import statements
+
+public interface IRemote extends android.os.IInterface
+{
+/** Local-side IPC implementation stub class. */
+    public static abstract class Stub extends android.os.Binder implements com.example.aidlserver.IRemote
+    {
+       private static final java.lang.String DESCRIPTOR = "com.example.aidlserver.IRemote";
+    /** Construct the stub at attach it to the interface. */
+       public Stub()
+       {
+          this.attachInterface(this, DESCRIPTOR);
+       }
+    /**
+     * Cast an IBinder object into an com.example.aidlserver.IRemote interface,
+     * generating a proxy if needed.
+     */
+        public static com.example.aidlserver.IRemote asInterface(android.os.IBinder obj)
+        {
+            if ((obj==null)) {
+                return null;
+            }
+            android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
+            if (((iin!=null)&&(iin instanceof com.example.aidlserver.IRemote))) {
+                return ((com.example.aidlserver.IRemote)iin);
+            }
+            return new com.example.aidlserver.IRemote.Stub.Proxy(obj);
+        }
+        @Override public android.os.IBinder asBinder()
+        {
+            return this;
+        }
+        @Override public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) throws android.os.RemoteException
+        {
+        switch (code)
+        {
+            case INTERFACE_TRANSACTION:
+            {
+                reply.writeString(DESCRIPTOR);
+                return true;
+            }
+            case TRANSACTION_multi:
+            {
+                data.enforceInterface(DESCRIPTOR);
+                int _arg0;
+                _arg0 = data.readInt();
+                int _arg1;
+                _arg1 = data.readInt();
+                int _result = this.multi(_arg0, _arg1);
+                reply.writeNoException();
+                reply.writeInt(_result);
+                return true;
+            }
+        }
+            return super.onTransact(code, data, reply, flags);
+        }
+        private static class Proxy implements com.example.aidlserver.IRemote
+        {
+            private android.os.IBinder mRemote;
+            Proxy(android.os.IBinder remote)
+            {
+                mRemote = remote;
+            }
+            @Override public android.os.IBinder asBinder()
+            {
+                return mRemote;
+            }
+            public java.lang.String getInterfaceDescriptor()
+            {
+                return DESCRIPTOR;
+            }
+            @Override public int multi(int a, int b) throws android.os.RemoteException
+            {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                int _result;
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    _data.writeInt(a);
+                    _data.writeInt(b);
+                    mRemote.transact(Stub.TRANSACTION_multi, _data, _reply, 0);
+                    _reply.readException();
+                    _result = _reply.readInt();
+                }
+                finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+                return _result;
+            }
+        }
+        static final int TRANSACTION_multi = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
+    }
+    public int multi(int a, int b) throws android.os.RemoteException;
+}
+
+```
+
+关于Binder机制，我有过一篇博客说明，这一次重点放在AIDL生成的Java代码规范上，关于BInder本地对象、代理对象概念不清楚的同学可以看这篇博客
+https://blog.csdn.net/z979451341/article/details/68941459
+
+
+首先IRemote实现了IInterface接口，如果是Server端调用这个Stub函数会得到Binder本地对象，如果是Client端会得到Binder代理对象
+
+```
+private static final java.lang.String DESCRIPTOR = "com.example.aidlserver.IRemote";
+/** Construct the stub at attach it to the interface. */
+public Stub()
+{
+this.attachInterface(this, DESCRIPTOR);
+}
+```
+我们首先说一下IRemote的代码结构，实现了IInterface接口、有一个内部类Stub，这个内部类还有一个内部类Proxy，然后就是multi函数（没有实现，这是在Service里继承实现的）。
+
+然后这个Stub是引入了IRemote接口和继承了BInder类，说白了Stub才是IRemote真正的实现者，
+
+我们需要注意这个Stub构造函数，因为在Server端的Service里我们需要通过这个Stub对象来实现multi函数的功能，他的意思是将Stub对象也就是Binder本地对象与这个字符串绑定了
+
+```
+       private static final java.lang.String DESCRIPTOR = "com.example.aidlserver.IRemote";
+       public Stub()
+       {
+          this.attachInterface(this, DESCRIPTOR);
+       }
+```
+
+在Client端通过ServiceConnection获取Binder对象，并且使用asInterface获取Binder代理对象（如果实在Server通过这种方式获得的是BInder本地对象），
+
+```
+        public static com.example.aidlserver.IRemote asInterface(android.os.IBinder obj)
+        {
+            if ((obj==null)) {
+                return null;
+            }
+            android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
+            if (((iin!=null)&&(iin instanceof com.example.aidlserver.IRemote))) {
+                return ((com.example.aidlserver.IRemote)iin);
+            }
+            return new com.example.aidlserver.IRemote.Stub.Proxy(obj);
+        }
+```
+
+然后Client端使用这个Binder代理对象调用multi函数，调用的代码如下
+
+```
+            @Override public int multi(int a, int b) throws android.os.RemoteException
+            {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                int _result;
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    _data.writeInt(a);
+                    _data.writeInt(b);
+                    mRemote.transact(Stub.TRANSACTION_multi, _data, _reply, 0);
+                    _reply.readException();
+                    _result = _reply.readInt();
+                }
+                finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+                return _result;
+            }
+```
+
+这里要注意mRemote是什么，是Binder本地对象，因为当初创建Proxy对象的时候把Stub对象传过去了
+
+```
+new com.example.aidlserver.IRemote.Stub.Proxy(obj);
+```
+这个transact函数对应着onTransact函数，我们在看看Stub的onTransact函数，这里可以看到他调用了multi函数并返回值（注意multi函数在Server端的Service里实现了）
+
+```
+        @Override public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) throws android.os.RemoteException
+        {
+            switch (code)
+            {
+                case INTERFACE_TRANSACTION:
+                {
+                    reply.writeString(DESCRIPTOR);
+                    return true;
+                }
+                case TRANSACTION_multi:
+                {
+                    data.enforceInterface(DESCRIPTOR);
+                    int _arg0;
+                    _arg0 = data.readInt();
+                    int _arg1;
+                    _arg1 = data.readInt();
+                    int _result = this.multi(_arg0, _arg1);
+                    reply.writeNoException();
+                    reply.writeInt(_result);
+                    return true;
+                }
+            }
+            return super.onTransact(code, data, reply, flags);
+        }
+```
+
+最后就是要注意在Client端数据的传递和获取数据的返回值的顺序不能改，因为在Server端数据的接收和返回值的传送的顺序是一定的，从代码上可以看得出。
+
+总结：AIDL生成的java代码包含Stub（BInder本地对象）、Proxy（BInder代理对象），Server端的Service实现了AIDL函数的真正功能，并重写onBind函数使其他进程可以获取它实现的Stub对象，在Client端通过ServiceConnection获取的是Proxy对象，而Proxy对象持有Stub对象，所以通过使用Proxy来调用Stub的函数就是使用的代理模式。在Client端数据传递过去，在Server端获取数据经过调用函数返回结果，在Client端获取返回值
+

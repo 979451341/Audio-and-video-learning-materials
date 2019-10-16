@@ -2,7 +2,7 @@
 
 这是我辛苦收集的音视频学习代码，各位大大，求个star
 
-这是在下写的音视频系列博文，各位大大指教一下 http://blog.csdn.net/column/details/19352.html
+这是在下写的音视频系列博文，各位大大指教一下 https://jianpanwuzhe.blog.csdn.net/article/category/9271854
 
 Android 音视频深入 二十一 FFmpeg视频剪切
 
